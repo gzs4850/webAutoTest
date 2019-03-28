@@ -18,18 +18,54 @@ class WaitUtil(object):
         self.driver = driver
         self.wait = WebDriverWait(self.driver,30)
 
-    def frame_available_and_switch_to_it(self,locationType,locatorExpression):
+    def presenceOfElementLocated(self,locatorMethod,locatorExpression,*arg):
+        '''显示等待页面元素出现在DOM中，但并不一定可见，存在则返回该页面元素对象'''
         try:
-            self.wait.until(EC.frame_to_be_available_and_switch_to_it((self.locationTypeDict[locationType.lower()],locatorExpression)))
+            if self.locationTypeDict.has_key(locatorMethod.lower()):
+                self.wait.until(
+                    EC.presence_of_element_located((
+                        self.locationTypeDict[locatorMethod.lower()],
+                        locatorExpression)))
+            else:
+                raise TypeError(u"未找到定位方式，请确认定位方法是否书写正确")
         except Exception as e:
             raise e
 
-    def visibility_element_located(self,locationType,locatorExpression):
+    def frameToBeAvailableAndSwitchToIt(self,locatorType,locatorExpression,*arg):
+        '''检查frame是否存在，存在则切换进frame中'''
         try:
-            element = self.wait.until(EC.visibility_of_element_located((self.locationTypeDict[locationType.lower()],locatorExpression)))
-            return element
+            self.wait.until(
+                EC.frame_to_be_available_and_switch_to_it((
+                    self.locationTypeDict[locatorType.lower()],
+                    locatorExpression)))
         except Exception as e:
             raise e
+
+    def visibilityOfElementLocated(self,locationType,locatorExpression,*args):
+        '''显示等待页面元素出现在DOM中，并且可见，存在则返回该页面元素对象'''
+        try:
+            self.wait.until(
+                EC.visibility_of_element_located((
+                    self.locationTypeDict[locationType.lower()],
+                    locatorExpression
+                ))
+            )
+        except Exception as e:
+            raise e
+
+
+    # def frame_available_and_switch_to_it(self,locationType,locatorExpression):
+    #     try:
+    #         self.wait.until(EC.frame_to_be_available_and_switch_to_it((self.locationTypeDict[locationType.lower()],locatorExpression)))
+    #     except Exception as e:
+    #         raise e
+
+    # def visibility_element_located(self,locationType,locatorExpression,*arg):
+    #     try:
+    #         element = self.wait.until(EC.visibility_of_element_located((self.locationTypeDict[locationType.lower()],locatorExpression)))
+    #         return element
+    #     except Exception as e:
+    #         raise e
 
 if __name__ == '__main__':
     from selenium import webdriver
@@ -38,7 +74,7 @@ if __name__ == '__main__':
     driver.get("http://mail.126.com")
     time.sleep(10)
     waitUtil = WaitUtil(driver)
-    waitUtil.frame_available_and_switch_to_it("xpath","//div[@id='loginDiv']/descendant::iframe")
-    e = waitUtil.visibility_element_located("xpath","//input[@name='email']")
-    e.send_keys("success")
+    waitUtil.frameToBeAvailableAndSwitchToIt("xpath","//div[@id='loginDiv']/descendant::iframe")
+    waitUtil.visibilityOfElementLocated("xpath","//input[@name='email']")
+    waitUtil.presenceOfElementLocated("xpath","//input[@name='input']")
     driver.quit()

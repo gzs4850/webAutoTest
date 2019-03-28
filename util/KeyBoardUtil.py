@@ -1,6 +1,6 @@
 #encoding = utf-8
 import win32api
-import win32con
+import win32com
 
 class KeyBoardKeys(object):
     VK_CODE = {
@@ -12,10 +12,10 @@ class KeyBoardKeys(object):
     @staticmethod
     def keyDown(keyName):
         win32api.keybd_event(KeyBoardKeys.VK_CODE[keyName],0,0,0)
-        
+
     @staticmethod
     def keyUp(keyName):
-        win32api.keybd_event(KeyBoardKeys.VK_CODE[keyName],0,win32con.KEYEVENT_KEYUP,0)
+        win32api.keybd_event(KeyBoardKeys.VK_CODE[keyName],0,win32com.KEYEVENT_KEYUP,0)
 
     @staticmethod
     def oneKey(key):
