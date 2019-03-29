@@ -50,13 +50,15 @@ class ParseExcel(object):
 
     def getRow(self,sheet,rowNo):
         try:
-            return sheet.rows[rowNo - 1]
+            return list(sheet.rows)[rowNo-1]
+            # return sheet.rows[rowNo-1]
         except Exception as e:
             raise e
 
     def getColumn(self,sheet,colNo):
         try:
-            return sheet.column[colNo - 1]
+            return list(sheet.columns)[colNo-1]
+            # return sheet.column[colNo-1]
         except Exception as e:
             raise e
 
@@ -112,7 +114,7 @@ class ParseExcel(object):
     def writeCellCurrentTime(self,sheet,coordinate = None,rowNo = None,colsNo = None):
         now = int(time.time())
         timeArray = time.localtime(now)
-        currentTime = time.strptime("%Y-%m-%d %H:%M:%S",timeArray)
+        currentTime = time.strftime("%Y-%m-%d %H:%M:%S",timeArray)
         if coordinate is not None:
             try:
                 sheet.cell(coordinate = coordinate).value = currentTime
@@ -137,9 +139,9 @@ if __name__ == '__main__':
     print(type(sheet))
     print(pe.getRowsNumber(sheet))
     print(pe.getColsNumber(sheet))
-    rows = pe.getRow(sheet,1)
+    rows = pe.getRow(sheet,2)
     for i in rows:
         print(i.value)
     print(pe.getCellOfValue(sheet,rowNo=1,colsNo=1))
-    pe.writeCell(sheet,u"刘思",rowNo=10,colsNo=10)
+    pe.writeCell(sheet,u"刘思思",rowNo=10,colsNo=10)
     pe.writeCellCurrentTime(sheet,rowNo=10,colsNo=11)

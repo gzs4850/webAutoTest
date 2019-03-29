@@ -1,6 +1,7 @@
 #encoding = utf-8
 import win32api
 import win32com
+#python -m pip install pypiwin32
 
 class KeyBoardKeys(object):
     VK_CODE = {
