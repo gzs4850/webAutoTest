@@ -21,7 +21,7 @@ class WaitUtil(object):
     def presenceOfElementLocated(self,locatorMethod,locatorExpression,*arg):
         '''显示等待页面元素出现在DOM中，但并不一定可见，存在则返回该页面元素对象'''
         try:
-            if self.locationTypeDict.has_key(locatorMethod.lower()):
+            if self.locationTypeDict.get(locatorMethod.lower()) is not None:
                 self.wait.until(
                     EC.presence_of_element_located((
                         self.locationTypeDict[locatorMethod.lower()],
@@ -72,9 +72,9 @@ if __name__ == '__main__':
     import time
     driver = webdriver.Chrome(executable_path="E:\\chromedriver.exe")
     driver.get("http://mail.126.com")
-    time.sleep(10)
+    time.sleep(5)
     waitUtil = WaitUtil(driver)
     waitUtil.frameToBeAvailableAndSwitchToIt("xpath","//div[@id='loginDiv']/descendant::iframe")
     waitUtil.visibilityOfElementLocated("xpath","//input[@name='email']")
-    waitUtil.presenceOfElementLocated("xpath","//input[@name='input']")
+    waitUtil.presenceOfElementLocated("xpath","//input[@name='email']")
     driver.quit()
