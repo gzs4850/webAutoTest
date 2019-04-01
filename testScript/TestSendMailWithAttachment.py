@@ -10,7 +10,6 @@
 from action.PageAction import *
 from util.ParseExcel import ParseExcel
 from config.VarConfig import *
-import time
 import traceback
 from util.Log import *
 
@@ -37,6 +36,8 @@ def writeTestResult(sheetObj,rowNo,colsNo,testResult,errorInfo=None,picPath=None
 
     try:
         #在测试步骤sheet中写入测试时间
+        # print("rowNo:%s" %rowNo)
+        # print("colsNo:%s" %colsDict[colsNo][0])
         excelObj.writeCellCurrentTime(sheetObj,rowNo=rowNo,colsNo=colsDict[colsNo][0])
         #在测试步骤sheet中写入测试结果
         excelObj.writeCell(sheetObj,content=testResult,rowNo=rowNo,colsNo=colsDict[colsNo][1],style=colorDict[testResult])
@@ -56,19 +57,89 @@ def writeTestResult(sheetObj,rowNo,colsNo,testResult,errorInfo=None,picPath=None
 
 def TestSendMailWithAttachment():
     try:
+        #根据Excel文件sheet名获取sheet对象
         caseSheet = excelObj.getSheetByName(u"测试用例")
+        #获取测试用例sheet中是否执行对象
         isExecuteColumn = excelObj.getColumn(caseSheet,testCase_isExecute)
+        #记录执行成功的测试用例个数
         successfulCase = 0
+        #记录需要执行的测试用例个数
         requiredCase = 0
 
         for idx,i in enumerate(isExecuteColumn[1:]):
             if i.value.lower() == "y":
                 requiredCase += 1
+                #获取“测试用例”sheet中第idx+2行数据
+                # print("idx:%s" %idx)
                 caseRow = excelObj.getRow(caseSheet,idx + 2)
+                #获取第idx+2行的“步骤sheet”单元格内容
                 caseStepSheetName = caseRow[testCase_testStepSheetName-1].value
-                print(caseStepSheetName)
+                print("执行测试步骤sheet名：%s" %caseStepSheetName)
+
+                #根据用例步骤名获取步骤sheet对象
+                stepSheet = excelObj.getSheetByName(caseStepSheetName)
+                #获取步骤sheet中步骤数
+                stepNum = excelObj.getRowsNumber(stepSheet)
+                # print(stepNum)
+                #记录测试用例步骤的成功数
+                successfulSteps = 0
+                logging.info("开始执行用例" + '"%s"' %caseRow[testCase_testCaseName-1].value)
+
+                for step in range(2,stepNum+1):
+                    stepRow = excelObj.getRow(stepSheet,step)
+                    keyWord = stepRow[testStep_keyWords - 1].value
+                    locationType = stepRow[testStep_locationType - 1].value
+                    locatorExpression = stepRow[testStep_locatorExpression - 1].value
+                    operateValue = stepRow[testStep_operateValue - 1].value
+
+                    if isinstance(operateValue,int):
+                        operateValue = str(operateValue)
+
+                    # print("关键字 %s" %keyWord)
+                    # print("定位类型 %s" %locationType)
+                    # print("定位表达式 %s" %locatorExpression)
+                    # print("操作值 %s" %operateValue)
+
+                    expressionStr = ""
+
+                    if keyWord and operateValue and locationType is None and locatorExpression is None:
+                        expressionStr = keyWord.strip() + "('" + operateValue + "')"
+                    elif keyWord and operateValue is None and locationType is None and locatorExpression is None:
+                        expressionStr = keyWord.strip() + "()"
+                    elif keyWord and locationType and operateValue and locatorExpression is None:
+                        expressionStr = keyWord.strip() + "('" + locationType.strip() + "','" + operateValue + "')"
+                    elif keyWord and locationType and locatorExpression and operateValue:
+                        expressionStr = keyWord.strip() + "('" + locationType.strip() + "','" + \
+                                        locatorExpression.replace("'",'"').strip() + "','" + operateValue + "')"
+                    elif keyWord and locationType and locatorExpression and operateValue is None:
+                        expressionStr = keyWord.strip() + "('" + locationType.strip() + "','" + locatorExpression.replace("'",'"').strip() + "')"
+                    print(expressionStr)
+
+                    try:
+                        eval(expressionStr)
+                        excelObj.writeCellCurrentTime(stepSheet,rowNo=step,colsNo=testStep_runTime)
+                    except Exception as e:
+                        capturePic = capture_screen()
+                        errorInfo = traceback.format_exc()
+
+                        # print(step, testStep_runTime)
+                        writeTestResult(stepSheet,step,"testStep","faild",errorInfo,capturePic)
+                        logging.info("步骤 %s 执行失败，错误信息：%s" %(stepRow[testStep_testStepDescribe -1].value,errorInfo))
+                    else:
+                        writeTestResult(stepSheet,step,"testStep","pass")
+                        successfulSteps += 1
+                        logging.info("步骤 %s 执行通过！" %stepRow[testStep_testStepDescribe - 1].value)
+
+                if successfulSteps == stepNum - 1:
+                    writeTestResult(caseSheet,idx+2,"testCase","pass")
+                    successfulCase += 1
+                else:
+                    writeTestResult(caseSheet,idx+2,"testCase","faild")
+
+        logging.info("共 %d 条用例，%d 条需要被执行，本次执行通过 %d 条。" %(len(isExecuteColumn) - 1,requiredCase,successfulCase))
     except Exception as e:
-        raise e
+        print(traceback.print_exc())
+
 
     # print("启动浏览器成功")
     # open_browser("chrome")

@@ -18,10 +18,10 @@ waitUtil = None
 
 def open_browser(browserName,*arg):
     #打开浏览器
-    global drvier,waitUtil
+    global driver,waitUtil
     try:
         if browserName.lower() == "ie":
-            drvier = webdriver.Ie(executable_path=ieDriverFilePath)
+            driver = webdriver.Ie(executable_path=ieDriverFilePath)
         elif browserName.lower() == "chrome":
             #创建Chrome浏览器的一个Options实例对象
             chrome_options = Options()
@@ -30,7 +30,7 @@ def open_browser(browserName,*arg):
                 "excludeSwitches",
                 ["ignore-certificate-errors"]
             )
-            drvier = webdriver.Chrome(executable_path=chromeDriverFilePath,chrome_options = chrome_options)
+            driver = webdriver.Chrome(executable_path=chromeDriverFilePath,chrome_options = chrome_options)
         else:
             driver = webdriver.Firefox(executable_path=firefoxDriverFilePath)
         #创建等待类实例对象
@@ -39,9 +39,9 @@ def open_browser(browserName,*arg):
         raise e
 
 def visit_url(url,*arg):
-    global drvier
+    global driver
     try:
-        drvier.get(url)
+        driver.get(url)
     except Exception as e:
         raise e
 
@@ -82,7 +82,7 @@ def click(locationType,locatorExpression,*arg):
 def assert_string_in_pagesource(assertString,*arg):
     global driver
     try:
-        assert assertString in driver.page_source,u"s% not found in page source" %assertString
+        assert assertString in driver.page_source,"s% not found in page source" %assertString
     except AssertionError as e:
         raise AssertionError(e)
     except Exception as e:
@@ -91,7 +91,7 @@ def assert_string_in_pagesource(assertString,*arg):
 def assert_title(titleStr,*arg):
     global driver
     try:
-        assert titleStr in driver.title,u"%s not found in title" %titleStr
+        assert titleStr in driver.title,"%s not found in title" %titleStr
     except AssertionError as e:
         raise AssertionError(e)
     except Exception as e:

@@ -1,6 +1,6 @@
 #encoding = utf-8
 import win32api
-import win32com
+import win32con
 #python -m pip install pypiwin32
 
 class KeyBoardKeys(object):
@@ -16,7 +16,7 @@ class KeyBoardKeys(object):
 
     @staticmethod
     def keyUp(keyName):
-        win32api.keybd_event(KeyBoardKeys.VK_CODE[keyName],0,win32com.KEYEVENT_KEYUP,0)
+        win32api.keybd_event(KeyBoardKeys.VK_CODE[keyName],0,win32con.KEYEVENTF_KEYUP,0)
 
     @staticmethod
     def oneKey(key):
