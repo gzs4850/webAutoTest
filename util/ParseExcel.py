@@ -58,14 +58,14 @@ class ParseExcel(object):
     def getColumn(self,sheet,colNo):
         try:
             return list(sheet.columns)[colNo-1]
-            # return sheet.column[colNo-1]
         except Exception as e:
             raise e
 
     def getCellOfValue(self,sheet,coordinate = None,rowNo = None, colsNo = None):
         if coordinate != None:
             try:
-                return sheet.cell(coordinate = coordinate).value
+                return sheet[coordinate].value
+                # return sheet.cell(coordinate = coordinate).value
             except Exception as e:
                 raise e
         elif coordinate is None and rowNo is not None and colsNo is not None:
@@ -79,7 +79,7 @@ class ParseExcel(object):
     def getCellOfObject(self,sheet,coordinate = None,rowNo = None,colsNo = None):
         if coordinate != None:
             try:
-                return sheet.cell(coordinate = coordinate)
+                return sheet[coordinate].value
             except Exception as e:
                 raise e
         elif coordinate == None and rowNo is not None and colsNo is not None:
@@ -93,9 +93,9 @@ class ParseExcel(object):
     def writeCell(self,sheet,content,coordinate = None,rowNo = None,colsNo = None,style = None):
         if coordinate is not None:
             try:
-                sheet.cell(coordinate = coordinate).value = content
+                sheet[coordinate].value = content
                 if style:
-                    sheet.cell(coordinate = coordinate).font = Font(color = self.RGBDict[style])
+                    sheet[coordinate].font = Font(color = self.RGBDict[style])
                 self.workbook.save(self.excelFile)
             except Exception as e:
                 raise e
@@ -117,7 +117,7 @@ class ParseExcel(object):
         currentTime = time.strftime("%Y-%m-%d %H:%M:%S",timeArray)
         if coordinate is not None:
             try:
-                sheet.cell(coordinate = coordinate).value = currentTime
+                sheet[coordinate].value = currentTime
                 self.workbook.save(self.excelFile)
             except Exception as e:
                 raise e
@@ -143,5 +143,6 @@ if __name__ == '__main__':
     for i in rows:
         print(i.value)
     print(pe.getCellOfValue(sheet,rowNo=1,colsNo=1))
+    print(pe.getCellOfValue(sheet, coordinate="B4"))
     pe.writeCell(sheet,u"刘思思",rowNo=10,colsNo=10)
     pe.writeCellCurrentTime(sheet,rowNo=10,colsNo=11)

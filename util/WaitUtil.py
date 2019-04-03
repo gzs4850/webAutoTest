@@ -10,6 +10,7 @@ class WaitUtil(object):
             "xpath":By.XPATH,
             "id":By.ID,
             "name":By.NAME,
+            "css_selector": By.CSS_SELECTOR,
             "class_name":By.CLASS_NAME,
             "tag_name":By.TAG_NAME,
             "link_text":By.LINK_TEXT,
@@ -53,19 +54,6 @@ class WaitUtil(object):
         except Exception as e:
             raise e
 
-
-    # def frame_available_and_switch_to_it(self,locationType,locatorExpression):
-    #     try:
-    #         self.wait.until(EC.frame_to_be_available_and_switch_to_it((self.locationTypeDict[locationType.lower()],locatorExpression)))
-    #     except Exception as e:
-    #         raise e
-
-    # def visibility_element_located(self,locationType,locatorExpression,*arg):
-    #     try:
-    #         element = self.wait.until(EC.visibility_of_element_located((self.locationTypeDict[locationType.lower()],locatorExpression)))
-    #         return element
-    #     except Exception as e:
-    #         raise e
 
 if __name__ == '__main__':
     from selenium import webdriver

@@ -11,8 +11,8 @@ from util.WaitUtil import WaitUtil
 from selenium.webdriver.chrome.options import Options
 import time
 
-#定义全局drvier变量
-drvier = None
+#定义全局driver变量
+driver = None
 #定义waitUtil全局等待类实例
 waitUtil = None
 
@@ -45,7 +45,7 @@ def visit_url(url,*arg):
     except Exception as e:
         raise e
 
-def close_browser():
+def close_browser(*arg):
     global driver
     try:
         driver.quit()
@@ -61,7 +61,7 @@ def sleep(seconds,*arg):
 def clear(locationType,locatorExpression,*arg):
     global driver
     try:
-        getElement(drvier,locationType,locatorExpression).clear()
+        getElement(driver,locationType,locatorExpression).clear()
     except Exception as e:
         raise e
 
@@ -183,4 +183,3 @@ def waitVisibilityOfElementLocated(locationType,locatorExpression,*args):
         waitUtil.visibilityOfElementLocated(locationType,locatorExpression)
     except Exception as e:
         raise e
-
